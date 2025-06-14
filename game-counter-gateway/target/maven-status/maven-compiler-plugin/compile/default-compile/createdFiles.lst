@@ -1,4 +1,0 @@
-Server.class
-handlers/HitGameHandler.class
-handlers/LoginHandler.class
-handlers/LogoutHandler.class
