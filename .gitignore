@@ -1,7 +1,10 @@
 # .gitignore
-/data
-/target
 /.idea
+/target
+/data
+/game-counter-core/data
+/game-counter-core/target
+/game-counter-gateway/target
 *.iml
 *.log
 *.class
