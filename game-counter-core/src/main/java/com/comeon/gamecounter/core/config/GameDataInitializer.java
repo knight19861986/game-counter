@@ -1,0 +1,36 @@
+package com.comeon.gamecounter.core.config;
+
+import com.comeon.gamecounter.core.DAO.GameRepository;
+import com.comeon.gamecounter.core.model.Game;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
+@Component
+public class GameDataInitializer implements CommandLineRunner {
+    private final GameRepository gameRepository;
+
+    @Autowired
+    public GameDataInitializer(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        insertIfNotExists("SANGUO2");
+        insertIfNotExists("HERO3");
+        insertIfNotExists("RICH4");
+        insertIfNotExists("FIFA2000");
+    }
+
+    private void insertIfNotExists(String gameCode) {
+        if (gameRepository.findById(gameCode).isEmpty()) {
+            Game game = new Game();
+            game.setGameCode(gameCode);
+            game.setHits(0);
+            game.setCreateTime(System.currentTimeMillis());
+            game.setUpdateTime(System.currentTimeMillis());
+            gameRepository.save(game);
+        }
+    }
+}
