@@ -1,7 +1,6 @@
+package com.comeon.gamecounter.gateway.legacy;
+
 import com.sun.net.httpserver.HttpServer;
-import handlers.HitGameHandler;
-import handlers.LoginHandler;
-import handlers.LogoutHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
