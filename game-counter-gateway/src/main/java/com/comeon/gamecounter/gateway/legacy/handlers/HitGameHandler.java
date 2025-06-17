@@ -1,4 +1,4 @@
-package com.comeon.gamecounter.gateway.legacy;
+package com.comeon.gamecounter.gateway.legacy.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

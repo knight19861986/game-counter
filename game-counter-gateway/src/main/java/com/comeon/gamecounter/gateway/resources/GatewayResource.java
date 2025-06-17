@@ -1,6 +1,9 @@
-package com.comeon.gamecounter.gateway;
+package com.comeon.gamecounter.gateway.resources;
+
+import com.comeon.gamecounter.gateway.POJO.LoginRequest;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -14,28 +17,47 @@ import java.net.http.HttpResponse;
 @Path("/comeon/gateway/api/v1")
 @Produces(MediaType.TEXT_PLAIN)
 public class GatewayResource {
-    private static final String CORE_BASE_URL = "http://localhost:9090/api";
+    private static final String CORE_BASE_URL = "http://localhost:9090/comeon/core/api/v1";
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    @GET
+    @Path("/hello")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String hello() {
+        return "Hello ComeOn!";
+    }
 
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response login(Credentials credentials) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(LoginRequest loginRequest) {
         try {
-            String body = String.format("{\"username\":\"%s\", \"password\":\"%s\"}",
-                    credentials.getUsername(), credentials.getPassword());
+            if (loginRequest == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Request body is missing or malformed").build();
+            }
+
+            String requestBody = String.format("{\"playerId\": %d, \"password\": \"%s\"}",
+                    loginRequest.getPlayerId(), loginRequest.getPassword());
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(CORE_BASE_URL + "/login"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return Response.status(response.statusCode()).entity(response.body()).build();
+            HttpResponse<String> response = httpClient
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            return Response.status(response.statusCode())
+                    .entity(response.body())
+                    .build();
+
         } catch (Exception e) {
-            return Response.serverError().entity("Error calling core: " + e.getMessage()).build();
+            return Response.serverError()
+                    .entity("Error calling core: " + e.getMessage())
+                    .build();
         }
     }
-
 }
