@@ -8,12 +8,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 @Path("/comeon/gateway/api/v1")
 @Produces(MediaType.TEXT_PLAIN)
@@ -83,6 +86,39 @@ public class GatewayResource {
             return Response.status(response.statusCode()).entity(response.body()).build();
         } catch (Exception e) {
             return Response.serverError().entity("Error calling core: " + e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/hit")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response hitGame(@QueryParam("sessionId") String sessionId,
+                            @QueryParam("gameCode") String gameCode) {
+        if (sessionId == null || sessionId.isBlank() || gameCode == null || gameCode.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Missing or blank sessionId or gameCode")
+                    .build();
+        }
+
+        try {
+            String url = String.format("%s/hit?sessionId=%s&gameCode=%s",
+                    CORE_BASE_URL,
+                    URLEncoder.encode(sessionId, StandardCharsets.UTF_8),
+                    URLEncoder.encode(gameCode, StandardCharsets.UTF_8));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return Response.status(response.statusCode()).entity(response.body()).build();
+
+        } catch (Exception e) {
+            return Response.serverError()
+                    .entity("Error calling core: " + e.getMessage())
+                    .build();
         }
     }
 }
