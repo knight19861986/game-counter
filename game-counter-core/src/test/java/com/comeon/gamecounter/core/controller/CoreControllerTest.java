@@ -69,7 +69,7 @@ public class CoreControllerTest {
         HttpHeaders logoutHeaders = new HttpHeaders();
         HttpEntity<Void> logoutEntity = new HttpEntity<>(null, logoutHeaders);
         ResponseEntity<Void> logoutResponse = restTemplate.postForEntity(
-                baseUrl + "/logout?sessionId=" + sessionId,
+                baseUrl + "/logout/" + sessionId,
                 logoutEntity,
                 Void.class
         );

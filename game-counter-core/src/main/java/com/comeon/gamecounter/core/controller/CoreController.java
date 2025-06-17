@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,8 +52,8 @@ public class CoreController {
         }
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestParam @NotBlank String sessionId) {
+    @PostMapping("/logout/{sessionId}")
+    public ResponseEntity<?> logout(@PathVariable @NotBlank String sessionId) {
         boolean success = sessionService.logout(sessionId);
         return success
                 ? ResponseEntity.ok("Logout successful")

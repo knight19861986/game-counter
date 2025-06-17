@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -58,6 +59,30 @@ public class GatewayResource {
             return Response.serverError()
                     .entity("Error calling core: " + e.getMessage())
                     .build();
+        }
+    }
+
+    @POST
+    @Path("/logout/{sessionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logout(@PathParam("sessionId") String sessionId) {
+        if (sessionId == null || sessionId.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Missing sessionId")
+                    .build();
+        }
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(CORE_BASE_URL + "/logout/" + sessionId))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return Response.status(response.statusCode()).entity(response.body()).build();
+        } catch (Exception e) {
+            return Response.serverError().entity("Error calling core: " + e.getMessage()).build();
         }
     }
 }
