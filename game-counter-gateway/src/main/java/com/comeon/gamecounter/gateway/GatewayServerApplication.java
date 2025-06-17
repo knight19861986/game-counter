@@ -5,8 +5,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 public class GatewayApplication extends Application<GatewayConfiguration> {
-    public static void main(String[] args) throws Exception{
-        new GatewayApplication().run();
+    public static void main(String[] args) throws Exception {
+        new GatewayApplication().run(args);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class GatewayApplication extends Application<GatewayConfiguration> {
     }
 
     @Override
-    public void initialize (Bootstrap<GatewayConfiguration> bootstrap){
+    public void initialize(Bootstrap<GatewayConfiguration> bootstrap) {
 
     }
 
