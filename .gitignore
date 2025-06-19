@@ -5,6 +5,8 @@
 /game-counter-core/data
 /game-counter-core/target
 /game-counter-gateway/target
+/game-counter-loadtest/target
+*/target
 *.iml
 *.log
 *.class
