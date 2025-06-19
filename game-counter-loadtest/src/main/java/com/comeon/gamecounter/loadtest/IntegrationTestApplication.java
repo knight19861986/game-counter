@@ -22,7 +22,12 @@ public class IntegrationTestApplication {
         List<ClientSimulator> simulators = new ArrayList<>();
 
         for (int i = 0; i < clientCount; i++) {
-            ClientSimulator clientSimulator = new ClientSimulator(gatewayHost, gatewayPort, gatewayBasePath, actionsPerClient);
+            ClientSimulator clientSimulator = new ClientSimulator(
+                    gatewayHost,
+                    gatewayPort,
+                    gatewayBasePath,
+                    actionsPerClient,
+                    generatePassword(i));
             simulators.add(clientSimulator);
             executorService.submit(clientSimulator);
         }
@@ -39,5 +44,9 @@ public class IntegrationTestApplication {
         }
 
         System.out.println("Integration test complete.");
+    }
+
+    private static String generatePassword(int i) {
+        return "password" + i + i + i;
     }
 }

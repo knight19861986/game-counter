@@ -1,6 +1,5 @@
 package com.comeon.gamecounter.loadtest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,6 +17,7 @@ public class ClientSimulator implements Runnable {
     private final int gatewayPort;
     private final String gatewayBasePath;
     private final int actionCount;
+    private final String password;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -31,18 +31,19 @@ public class ClientSimulator implements Runnable {
 
     private static final String[] GAME_CODES = {"SANGUO2", "HERO3", "RICH4", "FIFA2000"};
 
-    public ClientSimulator(String gatewayHost, int gatewayPort, String gatewayBasePath, int actionCount) {
+    public ClientSimulator(String gatewayHost, int gatewayPort, String gatewayBasePath, int actionCount, String password) {
         this.gatewayHost = gatewayHost;
         this.gatewayPort = gatewayPort;
         this.gatewayBasePath = gatewayBasePath;
         this.actionCount = actionCount;
+        this.password = password;
     }
 
     private boolean signupAndLogin() throws IOException, InterruptedException {
         // Sign-up
         String signupUrl = String.format("http://%s:%d%s/signup?password=%s",
                 gatewayHost, gatewayPort, gatewayBasePath,
-                URLEncoder.encode("password123", StandardCharsets.UTF_8));
+                URLEncoder.encode(password, StandardCharsets.UTF_8));
 
         HttpRequest signupRequest = HttpRequest.newBuilder()
                 .uri(URI.create(signupUrl))
@@ -59,7 +60,7 @@ public class ClientSimulator implements Runnable {
 
         // Login
         String loginUrl = String.format("http://%s:%d%s/login", gatewayHost, gatewayPort, gatewayBasePath);
-        String loginBody = String.format("{\"playerId\": %d, \"password\": \"%s\"}", playerId, "password123");
+        String loginBody = String.format("{\"playerId\": %d, \"password\": \"%s\"}", playerId, password);
 
         HttpRequest loginRequest = HttpRequest.newBuilder()
                 .uri(URI.create(loginUrl))
@@ -123,7 +124,7 @@ public class ClientSimulator implements Runnable {
                 }
             }
 
-            Thread.sleep(1000);
+            Thread.sleep(10000);
             logout();
 
         } catch (Exception e) {
