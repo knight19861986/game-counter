@@ -32,6 +32,35 @@ public class GatewayResource {
     }
 
     @POST
+    @Path("/signup")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response signup(@QueryParam("password") String password) {
+        if (password == null || password.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Missing password")
+                    .build();
+        }
+
+        try {
+            String url = CORE_BASE_URL + "/signup?password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return Response.status(response.statusCode()).entity(response.body()).build();
+
+        } catch (Exception e) {
+            return Response.serverError()
+                    .entity("Error calling core: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
