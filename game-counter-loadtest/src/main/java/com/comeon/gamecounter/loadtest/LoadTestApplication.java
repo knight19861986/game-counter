@@ -1,7 +1,8 @@
 package com.comeon.gamecounter.loadtest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.comeon.gamecounter.core.CoreServerStarter;
+import com.comeon.gamecounter.gateway.GatewayServerStarter;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class IntegrationTestApplication {
-    public static void main(String[] args) {
-        String gatewayHost = "localhost";
-        int gatewayPort = 8080;
-        String gatewayBasePath = "/comeon/gateway/api/v1";
-
+public class LoadTestApplication {
+    public static void main(String[] args) throws Exception {
         final int clientCount = 10;            // Number of simulated clients
         final int actionsPerClient = 100;      // Actions per client (e.g., hits)
+
+        final int corePort = 9091;
+        final int gatewayPort = 8081;
+        String gatewayHost = "localhost";
+        String gatewayBasePath = "/comeon/gateway/api/v1";
+
+        System.out.println("Starting core server...");
+        ConfigurableApplicationContext coreContext = CoreServerStarter.start(corePort);
+
+        System.out.println("Starting gateway server...");
+        GatewayServerStarter.start(gatewayPort, false);
 
         ExecutorService executorService = Executors.newFixedThreadPool(clientCount);
         List<ClientSimulator> simulators = new ArrayList<>();
@@ -43,7 +51,9 @@ public class IntegrationTestApplication {
             Thread.currentThread().interrupt();
         }
 
-        System.out.println("Integration test complete.");
+        System.out.println("Integration test complete. Shutting down servers...");
+        coreContext.close();
+        GatewayServerStarter.stop();
     }
 
     private static String generatePassword(int i) {

@@ -33,9 +33,6 @@
             <artifactId>httpclient5</artifactId>
             <version>5.3</version>
         </dependency>
-
-        <!-- Optional: if need internal classes -->
-        <!--
         <dependency>
             <groupId>game-counter</groupId>
             <artifactId>game-counter-core</artifactId>
@@ -46,7 +43,9 @@
             <artifactId>game-counter-gateway</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
     </dependencies>
-
 </project>

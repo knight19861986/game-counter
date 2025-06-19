@@ -2,10 +2,7 @@
 /.idea
 /target
 /data
-/game-counter-core/data
-/game-counter-core/target
-/game-counter-gateway/target
-/game-counter-loadtest/target
+*/data
 */target
 *.iml
 *.log
