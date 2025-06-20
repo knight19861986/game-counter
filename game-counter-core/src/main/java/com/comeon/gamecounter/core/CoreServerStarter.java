@@ -6,9 +6,11 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.util.Map;
 
 public class CoreServerStarter {
-    public static ConfigurableApplicationContext start(int port) {
+    public static ConfigurableApplicationContext start(Map<String, String> props) {
         SpringApplication app = new SpringApplication(CoreServerApplication.class);
-        app.setDefaultProperties(Map.of("server.port", port));
-        return app.run();
+        String[] args = props.entrySet().stream()
+                .map(entry -> "--" + entry.getKey() + "=" + entry.getValue())
+                .toArray(String[]::new);
+        return app.run(args);
     }
 }

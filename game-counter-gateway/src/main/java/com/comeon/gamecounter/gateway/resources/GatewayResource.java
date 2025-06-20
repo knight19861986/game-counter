@@ -21,8 +21,12 @@ import java.nio.charset.StandardCharsets;
 @Path("/comeon/gateway/api/v1")
 @Produces(MediaType.TEXT_PLAIN)
 public class GatewayResource {
-    private static final String CORE_BASE_URL = "http://localhost:9090/comeon/core/api/v1";
     private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final String coreBaseUrl;
+
+    public GatewayResource(String coreHost, int corePort, String coreBasePath) {
+        this.coreBaseUrl = String.format("http://%s:%d%s", coreHost, corePort, coreBasePath);
+    }
 
     @GET
     @Path("/hello")
@@ -42,7 +46,7 @@ public class GatewayResource {
         }
 
         try {
-            String url = CORE_BASE_URL + "/signup?password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
+            String url = coreBaseUrl + "/signup?password=" + URLEncoder.encode(password, StandardCharsets.UTF_8);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -75,7 +79,7 @@ public class GatewayResource {
                     loginRequest.getPlayerId(), loginRequest.getPassword());
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(CORE_BASE_URL + "/login"))
+                    .uri(URI.create(coreBaseUrl + "/login"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -106,7 +110,7 @@ public class GatewayResource {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(CORE_BASE_URL + "/logout/" + sessionId))
+                    .uri(URI.create(coreBaseUrl + "/logout/" + sessionId))
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build();
 
@@ -131,7 +135,7 @@ public class GatewayResource {
 
         try {
             String url = String.format("%s/hit?sessionId=%s&gameCode=%s",
-                    CORE_BASE_URL,
+                    coreBaseUrl,
                     URLEncoder.encode(sessionId, StandardCharsets.UTF_8),
                     URLEncoder.encode(gameCode, StandardCharsets.UTF_8));
 

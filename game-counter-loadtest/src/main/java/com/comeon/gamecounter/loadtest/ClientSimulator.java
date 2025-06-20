@@ -18,6 +18,7 @@ public class ClientSimulator implements Runnable {
     private final String gatewayBasePath;
     private final int actionCount;
     private final String password;
+    private final String[] gameCodes;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -29,14 +30,18 @@ public class ClientSimulator implements Runnable {
     private int successCount = 0;
     private int failureCount = 0;
 
-    private static final String[] GAME_CODES = {"SANGUO2", "HERO3", "RICH4", "FIFA2000"};
-
-    public ClientSimulator(String gatewayHost, int gatewayPort, String gatewayBasePath, int actionCount, String password) {
+    public ClientSimulator(String gatewayHost,
+                           int gatewayPort,
+                           String gatewayBasePath,
+                           int actionCount,
+                           String password,
+                           String[] gameCodes) {
         this.gatewayHost = gatewayHost;
         this.gatewayPort = gatewayPort;
         this.gatewayBasePath = gatewayBasePath;
         this.actionCount = actionCount;
         this.password = password;
+        this.gameCodes = gameCodes;
     }
 
     private boolean signupAndLogin() throws IOException, InterruptedException {
@@ -139,6 +144,6 @@ public class ClientSimulator implements Runnable {
     }
 
     private String getRandomGameCode() {
-        return GAME_CODES[random.nextInt(GAME_CODES.length)];
+        return gameCodes[random.nextInt(gameCodes.length)];
     }
 }

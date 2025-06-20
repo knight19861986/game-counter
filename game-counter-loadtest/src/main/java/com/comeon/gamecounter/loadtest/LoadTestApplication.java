@@ -4,27 +4,49 @@ import com.comeon.gamecounter.core.CoreServerStarter;
 import com.comeon.gamecounter.gateway.GatewayServerStarter;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class LoadTestApplication {
     public static void main(String[] args) throws Exception {
-        final int clientCount = 10;            // Number of simulated clients
-        final int actionsPerClient = 100;      // Actions per client (e.g., hits)
+        Properties props = new Properties();
+        try (InputStream in = LoadTestApplication
+                .class
+                .getClassLoader()
+                .getResourceAsStream("loadtest.properties")) {
+            props.load(in);
+        }
 
-        final int corePort = 9091;
-        final int gatewayPort = 8081;
-        String gatewayHost = "localhost";
-        String gatewayBasePath = "/comeon/gateway/api/v1";
+        final int clientCount = Integer.parseInt(props.getProperty("client.count"));
+        final int actionsPerClient = Integer.parseInt(props.getProperty("actions.per.client"));
+
+        final String coreHost = props.getProperty("core.host");
+        final int corePort = Integer.parseInt(props.getProperty("core.port"));
+        final String coreBasePath = props.getProperty("core.base.path");
+        final String gatewayHost = props.getProperty("gateway.host");
+        final int gatewayPort = Integer.parseInt(props.getProperty("gateway.port"));
+        final String gatewayBasePath = props.getProperty("gateway.base.path");
+        final String[] gameCodes = props.getProperty("game.codes").split(",");
 
         System.out.println("Starting core server...");
-        ConfigurableApplicationContext coreContext = CoreServerStarter.start(corePort);
+        Map<String, String> argsOfRunCore = Map.of(
+                "server.port", String.valueOf(corePort),
+                "spring.datasource.url", "jdbc:h2:mem:testdb",
+                "spring.jpa.show-sql", "false"
+        );
+        ConfigurableApplicationContext coreContext = CoreServerStarter.start(argsOfRunCore);
+
+        String port = coreContext.getEnvironment().getProperty("server.port");
+        System.out.println("Core server running on port: " + port);
 
         System.out.println("Starting gateway server...");
-        GatewayServerStarter.start(gatewayPort, false);
+        GatewayServerStarter.start(gatewayPort, coreHost, corePort, coreBasePath, false);
 
         ExecutorService executorService = Executors.newFixedThreadPool(clientCount);
         List<ClientSimulator> simulators = new ArrayList<>();
@@ -35,7 +57,8 @@ public class LoadTestApplication {
                     gatewayPort,
                     gatewayBasePath,
                     actionsPerClient,
-                    generatePassword(i));
+                    generatePassword(i),
+                    gameCodes);
             simulators.add(clientSimulator);
             executorService.submit(clientSimulator);
         }
